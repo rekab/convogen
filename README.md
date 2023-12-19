@@ -1,0 +1,2 @@
+# convogen
+Generate endless conversations
