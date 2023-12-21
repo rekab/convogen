@@ -7,50 +7,67 @@ Generate endless conversations
 uses `say` on mac to talk to itself
 
 ```
-                     "SO, DO WE STILL HAVE TO PAY TAXES NOW
-                        THAT WE'RE TECHNICALLY NOT ALIVE
-                                   ANYMORE?"
+                    "SO, DID YOU EVER THINK YOU'D END UP AS
+                     A COMPUTER SIMULATION INSTEAD OF JUST
+                      ROTTING IN THE GROUND LIKE A REGULAR
+                                    HUMAN?"
 
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 The characters:
 
-KAREN: A conspiracy theorist who is convinced that aliens walk among us and
-       loves to share her outlandish theories.
-DANIEL: A self-proclaimed psychic who constantly predicts absurd and unlikely
-        events with complete confidence.
+FIONA: The conspiracy theorist who is convinced that the entire conversation is
+       being secretly recorded by aliens and keeps whispering paranoid theories
+       to the others.
+VEENA: The eccentric inventor who constantly interrupts the conversation with
+       bizarre and nonsensical ideas, like a machine that turns people into cats
+       or a flying toilet.
+SAMANTHA: The over-the-top drama queen who dramatically swoons and faints
+          whenever someone disagrees with them, or exclaims loudly and
+          dramatically at every opportunity.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
 
-KAREN: So, do we still have to pay taxes now that we're technically not alive
-       anymore?
+FIONA: So, did you ever think you'd end up as a computer simulation instead of
+       just rotting in the ground like a regular human?
 
 
-DANIEL: Of course not, Karen. We're dead. Taxes are for the living.
+VEENA: Oh, I never thought about that. But imagine if we could transfer our
+       consciousness into robots and live forever!
 
 
-KAREN: But what if the government is in on it? What if they know we're not
-       really dead and they're still trying to take our money?
+SAMANTHA: That's terrifying! I don't want to be a robot, I want to be a real
+          human!
 
 
-DANIEL: Oh, please. That's just your alien paranoia talking.
+FIONA: Or maybe we're not even real humans, maybe we're just pawns in an alien
+       simulation.
 
 
-KAREN: Hey, I've seen some things, Daniel. I know the truth.
+VEENA: Ooh, what if we're actually just characters in a video game being
+       controlled by someone else?
 
 
-DANIEL: And I've predicted some pretty crazy things, but even I don't believe in
-        your alien theories.
+SAMANTHA: This is all too much! I can't handle the thought of being a mere
+          simulation!
 
 
-KAREN: Well, I guess we'll just have to wait and see if we get a tax refund from
-       the afterlife then.
+FIONA: And what if they're recording our every word right now?
 
 
-DANIEL: Or maybe we'll end up paying taxes in hell. You never know.
+VEENA: Or what if we're actually in a parallel universe where cats are the
+       rulers and we're just their playthings?
 
 
-KAREN: Don't even joke about that, Daniel. I'm convinced the government has a
-       deal with the devil too.
+SAMANTHA: Oh, the horror! I can't believe this is happening to us!
+
+
+FIONA: Quick, let's say something outrageous and see if they react!
+
+
+VEENA: I have an idea for a machine that can turn people into flying toilets!
+
+
+SAMANTHA: Oh, the humanity! This is too much for me to handle!
 ```

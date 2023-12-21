@@ -1,10 +1,14 @@
-from openai import OpenAI
+import functools
+import json
 import os
 import random
 import re
 import subprocess
 import textwrap
 import time
+import pprint
+
+from openai import OpenAI
 
 
 api_key = os.environ.get('API_KEY')
@@ -14,6 +18,70 @@ available_voices = ['Alex', 'Daniel', 'Fiona', 'Fred', 'Karen', 'Moira',
                     'Samantha', 'Tessa', 'Veena', 'Victoria']
 random.shuffle(available_voices)
 
+
+def memoize_with_probability(cache_file):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Check if the cache file exists and load it
+            cache = {}
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r') as f:
+                    cache = json.load(f)
+
+            # Create a cache key based on the function's arguments
+            cache_key = repr((func.__name__, args, tuple(sorted(kwargs.items()))))
+
+            # Decide whether to use the cache or make a new call
+            if random.choice([True, False]) and cache_key in cache:
+                return cache[cache_key]
+            else:
+                result = func(*args, **kwargs)
+                cache[cache_key] = result
+                pprint.pprint(cache)
+                with open(cache_file, 'w') as f:
+                    json.dump(cache, f)
+                return result
+
+        return wrapper
+    return decorator
+
+
+def memoize_with_increasing_probability(cache_file):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Check if the cache file exists and load it
+            cache = {}
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r') as f:
+                    cache = json.load(f)
+
+            # Adjust probability based on cache size
+            cache_size = len(cache)
+            probability = min(0.9, cache_size / 1000)
+
+            # Create a cache key based on the function's arguments
+            cache_key = repr((func.__name__, args, tuple(sorted(kwargs.items()))))
+
+            # Decide whether to use the cache or make a new call
+            if random.random() < probability and cache_key in cache:
+                print('cache hit for ', repr(cache_key))
+                return cache[cache_key]
+            else:
+                result = func(*args, **kwargs)
+                cache[cache_key] = result
+                with open(cache_file, 'w') as f:
+                    json.dump(cache, f)
+                return result
+
+        return wrapper
+    return decorator
+
+
+
+
+@memoize_with_increasing_probability('request_chatgpt.json')
 def request_chatgpt(api_key, prompt, max_tokens=200):
     """
     Sends a request to ChatGPT API using the openai package.
@@ -30,9 +98,29 @@ def request_chatgpt(api_key, prompt, max_tokens=200):
         max_tokens=max_tokens,
         temperature=0.7)
 
-    #print(f"response={repr(response)}")
-    #return response['choices'][0]['text'].strip().split('\n')
     return response.choices[0].text.strip().split('\n')
+
+def save_dialog_to_cache(dialog, filename="cached_dialog.json"):
+    with open(filename, 'w') as file:
+        json.dump(dialog, file)
+
+def load_dialog_from_cache(filename="cached_dialog.json"):
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            return json.load(file)
+    return None
+
+def get_or_create_dialog(api_key, prompt, max_tokens=100, cache_file="cached_dialog.json"):
+    # Decide whether to use cache
+    if random.random() < 0.5:
+        cached_dialog = load_dialog_from_cache(cache_file)
+        if cached_dialog:
+            return cached_dialog
+
+    # Create new dialog
+    dialog = request_chatgpt(api_key, prompt, max_tokens)
+    save_dialog_to_cache(dialog, cache_file)
+    return dialog
 
 
 class Speaker(object):
@@ -44,6 +132,9 @@ class Speaker(object):
     def __str__(self):
         return f"{self.name.upper()}: {self.personality}"
 
+    def to_dict(self):
+        return {"name": self.name, "personality": self.personality}
+
 
 class Dialog(object):
 
@@ -52,30 +143,54 @@ class Dialog(object):
         self.speakers = speakers
         self.script = script
 
+    def to_dict(self):
+        return {
+            "topic": self.topic,
+            "speakers": [speaker.to_dict() for speaker in self.speakers],
+            "script": self.script
+        }
 
+
+#@memoize_with_increasing_probability('generate_dialog.json')
 def generate_dialog(api_key):
     """
     Generates a dialog with random speakers based on funny topics and unique personalities.
     """
     # Generate funny topics
-    #topics_prompt = "List two funny and dark existential conversation topics by people who realize they're AI computer simulations:"
-    topics_prompt = "List two funny and dark existential conversation topics by people who are surprised and relieved to realize they're humans reborn as AI computer simulations:"
+    topics_prompt = [
+            ("List two funny and dark existential conversation topics by "
+             "people who are surprised and relieved to realize they're "
+             "humans reborn as AI computer simulations:"),
+            ("List two funny and dark existential conversation topics by "
+             "people who realize they're AI computer simulations:"),
+            ("List two funny and dark existential conversation topics by "
+             "people who are defending their house:"),
+            ("List two funny and dark existential conversation topics by "
+             "people who want it known the house is not empty:"),
+            ("List two funny and dark existential conversation topics by "
+             "people who want it known the house is not empty:"),
+            ("List two funny and dark existential conversation topics by "
+             "people who break the 4th wall knowing they're AI generated "
+             "characters being voiced by a computer:")
+        ]
+    topic_prompt = random.choice(topics_prompt)
+
     funny_topics = [re.sub(r'^\d+\.\s+', '', t) for t in request_chatgpt(api_key, topics_prompt) if t != '']
     topic = random.choice(funny_topics)
-    #print(f"TOPIC: {topic}\n")
 
     # Generate unique personalities
-    personalities_prompt = "List three unique and bold personalities for a humorous conversation:"
-    personalities = [re.sub(r'^\d+\.\s+', '', p) for p in request_chatgpt(api_key, personalities_prompt) if p != '']
-    #personalities_str = '\n'.join(personalities)
-    #print(f"personalities: {personalities_str}\n")
+    personalities_prompt = ("List three unique, strange, bold, and/or wild "
+                            "personalities for a humorous conversation:")
+    personalities = [re.sub(r'^\d+\.\s+', '', p)
+                     for p in request_chatgpt(api_key, personalities_prompt)
+                     if p != '']
 
     num_speakers = random.randint(2, len(personalities))
     speaker_personalities = random.sample(personalities, num_speakers)
     speaker_names = [available_voices[i] for i in range(num_speakers)]
     speakers = [Speaker(name, personality) for (name, personality) in zip(speaker_names, speaker_personalities)]
 
-    dialog_prompt = f"Create a SHORT funny and dark conversation about '{topic}' with {num_speakers} speakers, each having a unique personality. Only include dialog, no actions, emotes, or emphasis:\n"
+    dialog_prompt = f"Create a SHORT funny and dark conversation about '{topic}' with {num_speakers} speakers, each having a unique personality. \n"
     #dialog_prompt = f"Create a SHORT funny and DARK conversation about favorite puppies with {num_speakers} speakers, each having a unique personality. Only include dialog, no actions, emotes, or emphasis:\n"
     for i, speaker in enumerate(speaker_names):
         #print(f"{speaker} is {speaker_personalities[i]}\n")
